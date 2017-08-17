@@ -11,6 +11,8 @@ import hmac
 import base64
 import utils
 import re
+import six
+
 try:
     from xml.etree.ElementTree import ParseError as XMLError
 except ImportError:
@@ -73,10 +75,7 @@ def remove_empty(d):
         Helper function that removes all keys from a dictionary (d),
         that have an empty value.
     """
-    for key in d.keys():
-        if not d[key]:
-            del d[key]
-    return d
+    return dict((key, value) for key, value in six.iteritems(d) if value)
 
 
 def remove_namespace(xml):
