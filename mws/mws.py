@@ -8,7 +8,6 @@
 import hashlib
 import hmac
 import base64
-import utils
 import re
 import six
 
@@ -23,6 +22,8 @@ from time import strftime, gmtime
 
 from requests import request
 from requests.exceptions import HTTPError
+
+from mws import utils
 
 
 __all__ = [
