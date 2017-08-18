@@ -91,8 +91,7 @@ class DictWrapper(object):
         self.original = xml
         self._rootkey = rootkey
         self._mydict = utils.xml2dict().fromstring(remove_namespace(xml))
-        self._response_dict = self._mydict.get(self._mydict.keys()[0],
-                                               self._mydict)
+        self._response_dict = self._mydict.get([*self._mydict][0], self._mydict)
 
     @property
     def parsed(self):
