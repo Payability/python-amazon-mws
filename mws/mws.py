@@ -90,6 +90,12 @@ def remove_namespace(xml):
     return regex.sub('', xml.decode('utf-8'))
 
 
+def map_to_list(items):
+    if not isinstance(items, list):
+        items = [items]
+    return items
+
+
 class DictWrapper(object):
     def __init__(self, xml, rootkey=None):
         self.original = xml
@@ -711,4 +717,102 @@ class Finances(MWS):
             Based on the "NextToken".
         """
         data = dict(Action='ListFinancialEventsByNextToken', NextToken=token)
+        return self.make_request(data)
+
+
+class Subscriptions(MWS):
+    """ Amazon MWS Subscriptions API """
+
+    URI = '/Subscriptions/2013-07-01'
+    VERSION = '2013-07-01'
+    NS = '{https://mws.amazonservices.com/Subscriptions/2013-07-01}'
+
+    def register_destination(self, marketplace_id, destination_urls, delivery_channel='SQS',
+                             destination_key='sqsQueueUrl'):
+        data = dict(Action='RegisterDestination',
+                    MarketplaceId=marketplace_id)
+        data.update({'Destination.DeliveryChannel': delivery_channel})
+        for i, url in enumerate(map_to_list(destination_urls), 1):
+            data.update({'Destination.AttributeList.member.{}.Key'.format(i): destination_key,
+                         'Destination.AttributeList.member.{}.Value'.format(i): url})
+        return self.make_request(data)
+
+    def deregister_destination(self, marketplace_id, destination_urls, delivery_channel='SQS',
+                               destination_key='sqsQueueUrl'):
+        data = dict(Action='DeregisterDestination',
+                    MarketplaceId=marketplace_id)
+        data.update({'Destination.DeliveryChannel': delivery_channel})
+        for i, url in enumerate(map_to_list(destination_urls), 1):
+            data.update({'Destination.AttributeList.member.{}.Key'.format(i): destination_key,
+                         'Destination.AttributeList.member.{}.Value'.format(i): url})
+        return self.make_request(data)
+
+    def list_registered_destinations(self, marketplace_id):
+        data = dict(Action='ListRegisteredDestinations',
+                    MarketplaceId=marketplace_id)
+        return self.make_request(data)
+
+    def send_test_notification_to_destination(self, marketplace_id, destination_urls, delivery_channel='SQS',
+                                              destination_key='sqsQueueUrl'):
+        data = dict(Action='SendTestNotificationToDestination',
+                    MarketplaceId=marketplace_id)
+        data.update({'Destination.DeliveryChannel': delivery_channel})
+        for i, url in enumerate(map_to_list(destination_urls), 1):
+            data.update({'Destination.AttributeList.member.{}.Key'.format(i): destination_key,
+                         'Destination.AttributeList.member.{}.Value'.format(i): url})
+        return self.make_request(data)
+
+    def create_subscription(self, marketplace_id, notification_type, destination_urls, delivery_channel='SQS',
+                            destination_key='sqsQueueUrl', is_enabled='true'):
+        data = dict(Action='CreateSubscription',
+                    MarketplaceId=marketplace_id)
+        data.update({'Subscription.IsEnabled': is_enabled,
+                     'Subscription.Destination.DeliveryChannel': delivery_channel,
+                     'Subscription.NotificationType': notification_type})
+        for i, url in enumerate(map_to_list(destination_urls), 1):
+            data.update({'Subscription.Destination.AttributeList.member.{}.Key'.format(i): destination_key,
+                         'Subscription.Destination.AttributeList.member.{}.Value'.format(i): url})
+        return self.make_request(data)
+
+    def get_subscription(self, marketplace_id, notification_type, destination_urls, delivery_channel='SQS',
+                         destination_key='sqsQueueUrl'):
+        data = dict(Action='GetSubscription',
+                    MarketplaceId=marketplace_id,
+                    NotificationType=notification_type)
+        data.update({'Destination.DeliveryChannel': delivery_channel})
+        for i, url in enumerate(map_to_list(destination_urls), 1):
+            data.update({'Destination.AttributeList.member.{}.Key'.format(i): destination_key,
+                         'Destination.AttributeList.member.{}.Value'.format(i): url})
+        return self.make_request(data)
+
+    def delete_subscription(self, marketplace_id, notification_type, destination_urls, delivery_channel='SQS',
+                            destination_key='sqsQueueUrl'):
+        data = dict(Action='DeleteSubscription',
+                    MarketplaceId=marketplace_id,
+                    NotificationType=notification_type)
+        data.update({'Destination.DeliveryChannel': delivery_channel})
+        for i, url in enumerate(map_to_list(destination_urls), 1):
+            data.update({'Destination.AttributeList.member.{}.Key'.format(i): destination_key,
+                         'Destination.AttributeList.member.{}.Value'.format(i): url})
+        return self.make_request(data)
+
+    def list_subscriptions(self, marketplace_id):
+        data = dict(Action='ListSubscriptions',
+                    MarketplaceId=marketplace_id)
+        return self.make_request(data)
+
+    def update_subscription(self, marketplace_id, notification_type, destination_urls, delivery_channel='SQS',
+                            destination_key='sqsQueueUrl', is_enabled='true'):
+        data = dict(Action='UpdateSubscription',
+                    MarketplaceId=marketplace_id)
+        data.update({'Subscription.IsEnabled': is_enabled,
+                     'Subscription.Destination.DeliveryChannel': delivery_channel,
+                     'Subscription.NotificationType': notification_type})
+        for i, url in enumerate(map_to_list(destination_urls), 1):
+            data.update({'Subscription.Destination.AttributeList.member.{}.Key'.format(i): destination_key,
+                         'Subscription.Destination.AttributeList.member.{}.Value'.format(i): url})
+        return self.make_request(data)
+
+    def get_service_status(self):
+        data = dict(Action='GetServiceStatus')
         return self.make_request(data)
