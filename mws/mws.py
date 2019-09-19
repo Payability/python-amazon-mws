@@ -87,7 +87,7 @@ def remove_empty(d):
 
 def remove_namespace(xml):
     regex = re.compile(' xmlns(:ns2)?="[^"]+"|(ns2:)|(xml:)')
-    return regex.sub('', xml.decode('utf-8'))
+    return regex.sub('', xml.decode('utf-8', 'ignore'))
 
 
 def map_to_list(items):
